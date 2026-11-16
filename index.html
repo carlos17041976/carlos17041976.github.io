@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carlos Fernandes Fidalgo | Engenheiro da Computação & Dev</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- AOS (Animate On Scroll) CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Google Fonts: Orbitron (Futurista) & Inter (Leitura) & Fira Code (Terminal) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           VARIÁVEIS DE TEMA CYBERPUNK / TECH FUTURISTA
+           ========================================================================== */
+        :root {
+            --bg-dark: #070913;
+            --bg-card: rgba(15, 21, 42, 0.72);
+            --bg-glass: rgba(10, 14, 28, 0.82);
+            --neon-cyan: #00f3ff;
+            --neon-purple: #b829ea;
+            --neon-green: #00ff88;
+            --neon-pink: #ff007f;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-glow: rgba(0, 243, 255, 0.28);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        h1, h2, h3, h4, .font-cyber {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.04em;
+        }
+
+        .font-code {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* ==========================================================================
+           CANVAS DE PARTÍCULAS INTERATIVAS & GRID DE FUNDO
+           ========================================================================== */
+        #cyber-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .cyber-grid-overlay {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(to right, rgba(0, 243, 255, 0.035) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(184, 41, 234, 0.035) 1px, transparent 1px);
+            background-size: 48px 48px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ==========================================================================
+           NAVBAR GLASSMORPHISM & EQUALIZADOR TECNO
+           ========================================================================== */
+        .navbar-cyber {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-glow);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-green));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+
+        .nav-link {
+            color: var(--text-main) !important;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0.9rem !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--neon-cyan) !important;
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 80%;
+        }
+
+        /* Botão de Áudio Tecno + Equalizador Animado */
+        .btn-techno {
+            background: rgba(0, 243, 255, 0.08);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            border-radius: 50px;
+            padding: 0.45rem 1.1rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .btn-techno:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .btn-techno.playing {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.12);
+            box-shadow: 0 0 22px rgba(0, 255, 136, 0.45);
+        }
+
+        .eq-bars {
+            display: inline-flex;
+            align-items: flex-end;
+            height: 16px;
+            gap: 3px;
+        }
+
+        .eq-bar {
+            width: 3px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+
+        .btn-techno.playing .eq-bar:nth-child(1) { animation: eqBounce 0.45s infinite alternate ease-in-out; }
+        .btn-techno.playing .eq-bar:nth-child(2) { animation: eqBounce 0.32s infinite alternate ease-in-out 0.1s; }
+        .btn-techno.playing .eq-bar:nth-child(3) { animation: eqBounce 0.55s infinite alternate ease-in-out 0.2s; }
+        .btn-techno.playing .eq-bar:nth-child(4) { animation: eqBounce 0.38s infinite alternate ease-in-out 0.15s; }
+        .btn-techno.playing .eq-bar:nth-child(5) { animation: eqBounce 0.48s infinite alternate ease-in-out 0.05s; }
+
+        @keyframes eqBounce {
+            0% { height: 4px; }
+            100% { height: 16px; }
+        }
+
+        /* ==========================================================================
+           SEÇÃO HERO & AVATAR 3D NEON
+           ========================================================================== */
+        .hero-section {
+            min-height: 100vh;
+            padding-top: 110px;
+            padding-bottom: 70px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .hero-glow-orb {
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            filter: blur(110px);
+            opacity: 0.25;
+            z-index: -1;
+            animation: floatOrb 9s infinite alternate ease-in-out;
+        }
+
+        .orb-cyan { background: var(--neon-cyan); top: 10%; left: -5%; }
+        .orb-purple { background: var(--neon-purple); bottom: 5%; right: -5%; animation-delay: 2s; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, -30px) scale(1.15); }
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 270px;
+            height: 270px;
+            margin: 0 auto;
+            border-radius: 50%;
+            padding: 8px;
+            background: conic-gradient(from 0deg, var(--neon-cyan), var(--neon-purple), var(--neon-green), var(--neon-cyan));
+            animation: spinRing 6s linear infinite;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.35), 0 0 70px rgba(184, 41, 234, 0.25);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .avatar-wrapper:hover {
+            transform: scale(1.06) rotate(3deg);
+        }
+
+        .avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #0d1326;
+            animation: spinRingReverse 6s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .avatar-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes spinRing {
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes spinRingReverse {
+            100% { transform: rotate(-360deg); }
+        }
+
+        .status-badge-cyber {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.35);
+            color: #e2e8f0;
+            padding: 0.45rem 0.95rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        .status-badge-cyber:hover {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .pulse-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+            animation: pulseDot 1.6s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { transform: scale(0.9); opacity: 1; }
+            50% { transform: scale(1.35); opacity: 0.6; }
+            100% { transform: scale(0.9); opacity: 1; }
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #ffffff 0%, var(--neon-cyan) 45%, var(--neon-purple) 85%, var(--neon-green) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .typewriter-cursor {
+            display: inline-block;
+            width: 3px;
+            background-color: var(--neon-green);
+            animation: blinkCursor 0.8s infinite;
+            margin-left: 3px;
+        }
+
+        @keyframes blinkCursor {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* Botões Cyber */
+        .btn-cyber-primary {
+            background: linear-gradient(135deg, var(--neon-cyan), #0099ff);
+            color: #050811;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 1.6rem;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-cyber-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 32px rgba(0, 243, 255, 0.75);
+            color: #000;
+        }
+
+        .btn-cyber-outline {
+            background: rgba(184, 41, 234, 0.1);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            border: 1px solid var(--neon-purple);
+            border-radius: 12px;
+            padding: 0.8rem 1.6rem;
+            box-shadow: 0 0 15px rgba(184, 41, 234, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .btn-cyber-outline:hover {
+            background: var(--neon-purple);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 0 28px rgba(184, 41, 234, 0.65);
+        }
+
+        /* ==========================================================================
+           TÍTULOS DE SEÇÃO & CARDS FUTURISTAS
+           ========================================================================== */
+        .section-padding {
+            padding: 95px 0;
+            position: relative;
+        }
+
+        .section-subtitle {
+            color: var(--neon-cyan);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .title-line {
+            width: 90px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-green));
+            border-radius: 4px;
+            margin: 0 auto 2.5rem auto;
+            box-shadow: 0 0 12px var(--neon-cyan);
+        }
+
+        .cyber-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 243, 255, 0.18);
+            border-radius: 18px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-green), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .cyber-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 243, 255, 0.22);
+        }
+
+        .cyber-card:hover::before {
+            left: 100%;
+        }
+
+        /* ==========================================================================
+           TIMELINE ACADÊMICA & BARRAS DE HABILIDADES
+           ========================================================================== */
+        .timeline-cyber {
+            position: relative;
+            padding-left: 32px;
+            border-left: 2px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -41px;
+            top: 18px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 3px solid var(--neon-cyan);
+            box-shadow: 0 0 12px var(--neon-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-dot {
+            background: var(--neon-green);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 18px var(--neon-green);
+            transform: scale(1.25);
+        }
+
+        .progress-cyber {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-cyber {
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-green));
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.5);
+            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* ==========================================================================
+           CAROUSEL BOOTSTRAP 5 CUSTOMIZADO COM EFEITOS NEON
+           ========================================================================== */
+        .carousel-cyber {
+            border-radius: 22px;
+            border: 1px solid rgba(184, 41, 234, 0.4);
+            box-shadow: 0 0 40px rgba(184, 41, 234, 0.2);
+            overflow: hidden;
+            background: linear-gradient(145deg, rgba(14, 20, 40, 0.92), rgba(8, 12, 26, 0.96));
+        }
+
+        .carousel-item {
+            padding: 3rem 2rem;
+            min-height: 340px;
+        }
+
+        .carousel-indicators [data-bs-target] {
+            width: 28px;
+            height: 4px;
+            background-color: var(--neon-cyan);
+            border-radius: 4px;
+            opacity: 0.4;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-indicators .active {
+            opacity: 1;
+            width: 44px;
+            background-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* ==========================================================================
+           TERMINAL INTERATIVO PYTHON (LABORATÓRIO)
+           ========================================================================== */
+        .terminal-window {
+            background: #05070e;
+            border: 1px solid rgba(0, 255, 136, 0.35);
+            border-radius: 16px;
+            box-shadow: 0 0 35px rgba(0, 255, 136, 0.12);
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: #0f1629;
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .terminal-dots span {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            color: #a7f3d0;
+            min-height: 290px;
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        /* ==========================================================================
+           FORMULÁRIO DE CONTATO & BOTÃO FLUTUANTE DE ÁUDIO
+           ========================================================================== */
+        .form-control-cyber {
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            color: #fff;
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control-cyber:focus {
+            background: rgba(15, 23, 42, 0.95);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 18px rgba(0, 243, 255, 0.25);
+            color: #fff;
+        }
+
+        .floating-audio-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1040;
+            backdrop-filter: blur(12px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05070f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#mainNavbar" data-bs-offset="100">
+
+    <!-- Canvas de Partículas Interativas -->
+    <canvas id="cyber-canvas"></canvas>
+    <div class="cyber-grid-overlay"></div>
+
+    <!-- ==========================================================================
+         1. MENU DE NAVEGAÇÃO FUNCIONAL (BOOTSTRAP 5 + GLASSMORPHISM)
+         ========================================================================== -->
+    <nav id="mainNavbar" class="navbar navbar-expand-lg navbar-dark navbar-cyber fixed-top py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#perfil">
+                <i class="bi bi-cpu-fill text-info fs-4"></i>
+                <span>CARLOS.DEV</span>
+            </a>
+
+            <div class="d-flex align-items-center gap-2 order-lg-3">
+                <!-- Controle de Música Tecno na Navbar -->
+                <button type="button" class="btn-techno techno-toggle-btn" aria-label="Alternar Música Tecno">
+                    <i class="bi bi-music-note-beamed"></i>
+                    <span class="techno-label d-none d-sm-inline">Som Tecno: OFF</span>
+                    <span class="eq-bars" aria-hidden="true">
+                        <span class="eq-bar"></span>
+                        <span class="eq-bar"></span>
+                        <span class="eq-bar"></span>
+                        <span class="eq-bar"></span>
+                        <span class="eq-bar"></span>
+                    </span>
+                </button>
+
+                <button class="navbar-toggler border-info" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavContent" aria-controls="navbarNavContent" aria-expanded="false" aria-label="Alternar navegação">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse order-lg-2" id="navbarNavContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 text-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#perfil">Início / Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#formacao">Formação & Skills</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#projetos">Projetos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#laboratorio">Laboratório & Vídeo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contato">Contato</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==========================================================================
+         2. SEÇÃO DE PERFIL (HERO + BIO + AVATAR NEON 3D)
+         ========================================================================== -->
+    <header id="perfil" class="hero-section">
+        <div class="hero-glow-orb orb-cyan"></div>
+        <div class="hero-glow-orb orb-purple"></div>
+
+        <div class="container">
+            <div class="row align-items-center gy-5">
+                <!-- Coluna Texto & Bio -->
+                <div class="col-lg-7 text-center text-lg-start" data-aos="fade-right" data-aos-duration="900">
+                    <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2 mb-4">
+                        <span class="status-badge-cyber">
+                            <span class="pulse-dot"></span> Disponível para Projetos
+                        </span>
+                        <span class="status-badge-cyber">
+                            <i class="bi bi-mortarboard-fill text-info"></i> ETEC de Dracena
+                        </span>
+                        <span class="status-badge-cyber">
+                            <i class="bi bi-motherboard text-warning"></i> Eng. da Computação
+                        </span>
+                    </div>
+
+                    <p class="font-code text-info mb-2">
+                        <i class="bi bi-terminal"></i> Olá, mundo! Eu sou
+                    </p>
+                    <h1 class="display-4 fw-bold mb-3 gradient-text">
+                        Carlos Fernandes Fidalgo
+                    </h1>
+
+                    <h2 class="h4 text-light mb-4 fw-normal" style="min-height: 36px;">
+                        <span id="typewriter-text" class="text-info fw-semibold"></span><span class="typewriter-cursor">&nbsp;</span>
+                    </h2>
+
+                    <p class="lead text-secondary mb-4" style="line-height: 1.75;">
+                        "Jovem moço descobrindo o Universo da Tecnologia. Perto de se formar <strong class="text-white">Engenheiro da Computação</strong> e <strong class="text-white">Bacharel em TI</strong>, e estudante de <strong class="text-info">Desenvolvimento de Sistemas na ETEC de Dracena</strong>."
+                    </p>
+
+                    <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3 mb-4">
+                        <a href="#projetos" class="btn btn-cyber-primary">
+                            <i class="bi bi-rocket-takeoff-fill me-2"></i>Explorar Projetos
+                        </a>
+                        <a href="https://github.com/carlos17041976" target="_blank" rel="noopener noreferrer" class="btn btn-cyber-outline">
+                            <i class="bi bi-github me-2"></i>GitHub @carlos17041976
+                        </a>
+                    </div>
+
+                    <!-- Mini Métricas -->
+                    <div class="row g-3 pt-2 text-center text-lg-start">
+                        <div class="col-4">
+                            <div class="p-2 rounded-3 border border-secondary border-opacity-25 bg-dark bg-opacity-50">
+                                <h4 class="mb-0 text-info fw-bold">7+</h4>
+                                <small class="text-secondary">Repositórios Git</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded-3 border border-secondary border-opacity-25 bg-dark bg-opacity-50">
+                                <h4 class="mb-0 text-success fw-bold">3</h4>
+                                <small class="text-secondary">Formações TI</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded-3 border border-secondary border-opacity-25 bg-dark bg-opacity-50">
+                                <h4 class="mb-0 text-warning fw-bold">100%</h4>
+                                <small class="text-secondary">Foco em Inovação</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coluna Avatar Estilizado -->
+                <div class="col-lg-5 text-center" data-aos="zoom-in" data-aos-duration="1000">
+                    <div class="avatar-wrapper mb-4" id="avatarTilt">
+                        <div class="avatar-inner">
+                            <!-- Avatar SVG Tecnológico Personalizado de Alta Qualidade com Fallback -->
+                            <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" class="w-100 h-100">
+                                <defs>
+                                    <linearGradient id="bgAvatar" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#0b132b"/>
+                                        <stop offset="50%" stop-color="#1c2541"/>
+                                        <stop offset="100%" stop-color="#090d16"/>
+                                    </linearGradient>
+                                    <linearGradient id="suitGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#00f3ff"/>
+                                        <stop offset="100%" stop-color="#b829ea"/>
+                                    </linearGradient>
+                                </defs>
+                                <rect width="300" height="300" fill="url(#bgAvatar)"/>
+                                <!-- Círculos de Circuito -->
+                                <circle cx="150" cy="150" r="130" fill="none" stroke="#00f3ff" stroke-opacity="0.2" stroke-width="2" stroke-dasharray="10 6"/>
+                                <circle cx="150" cy="150" r="112" fill="none" stroke="#00ff88" stroke-opacity="0.25" stroke-width="1.5"/>
+                                <!-- Ombros / Camisa Tech -->
+                                <path d="M65 290 C70 225, 110 205, 150 205 C190 205, 230 225, 235 290 Z" fill="#111827" stroke="url(#suitGrad)" stroke-width="3"/>
+                                <path d="M125 207 L150 245 L175 207" fill="none" stroke="#00f3ff" stroke-width="2.5"/>
+                                <!-- Pescoço -->
+                                <rect x="134" y="172" width="32" height="36" rx="12" fill="#e0a98f"/>
+                                <!-- Rosto -->
+                                <rect x="104" y="88" width="92" height="104" rx="44" fill="#f1c2a8"/>
+                                <!-- Cabelo -->
+                                <path d="M104 125 C102 82, 125 68, 150 68 C175 68, 198 82, 196 125 C192 98, 178 90, 150 90 C122 90, 108 98, 104 125 Z" fill="#1e2430"/>
+                                <!-- Óculos Futuristas / Visor -->
+                                <rect x="113" y="118" width="32" height="18" rx="5" fill="rgba(0,243,255,0.18)" stroke="#00f3ff" stroke-width="2.5"/>
+                                <rect x="155" y="118" width="32" height="18" rx="5" fill="rgba(0,243,255,0.18)" stroke="#00f3ff" stroke-width="2.5"/>
+                                <line x1="145" y1="126" x2="155" y2="126" stroke="#00f3ff" stroke-width="2.5"/>
+                                <!-- Olhos -->
+                                <circle cx="129" cy="127" r="3.5" fill="#1e293b"/>
+                                <circle cx="171" cy="127" r="3.5" fill="#1e293b"/>
+                                <!-- Sorriso confiante -->
+                                <path d="M132 156 Q150 172 168 156" fill="none" stroke="#7c2d12" stroke-width="3" stroke-linecap="round"/>
+                                <!-- Badge Código -->
+                                <rect x="95" y="248" width="110" height="26" rx="13" fill="#070913" stroke="#00ff88" stroke-width="1.5"/>
+                                <text x="150" y="265" text-anchor="middle" fill="#00ff88" font-family="monospace" font-size="12" font-weight="bold">&lt;DEV / ENG&gt;</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="cyber-card p-3 d-inline-block text-start mx-auto" style="max-width: 340px;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-info bg-opacity-10 p-3 text-info">
+                                <i class="bi bi-code-slash fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="font-code small text-success">@carlos17041976</div>
+                                <div class="fw-semibold text-white">Dracena — São Paulo, Brasil</div>
+                                <small class="text-secondary">Python • Sistemas • Automação • Web</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================================================================
+         3. NOVA SEÇÃO: FORMAÇÃO ACADÊMICA & HABILIDADES TÉCNICAS
+         ========================================================================== -->
+    <section id="formacao" class="section-padding">
+        <div class="container">
+            <div class="text-center" data-aos="fade-up">
+                <span class="section-subtitle">&lt;trajetoria_e_stack /&gt;</span>
+                <h2 class="section-title gradient-text">Formação Acadêmica & Habilidades</h2>
+                <div class="title-line"></div>
+            </div>
+
+            <div class="row g-5 align-items-start">
+                <!-- Coluna Esquerda: Timeline Acadêmica -->
+                <div class="col-lg-6" data-aos="fade-right">
+                    <h3 class="h4 mb-4 text-info d-flex align-items-center gap-2">
+                        <i class="bi bi-mortarboard-fill"></i> Formação & Graduação
+                    </h3>
+
+                    <div class="timeline-cyber">
+                        <!-- Item 1 -->
+                        <div class="timeline-item">
+                            <span class="timeline-dot"></span>
+                            <div class="cyber-card p-4">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                    <span class="badge bg-info text-dark font-code">Em Conclusão</span>
+                                    <small class="text-info font-code"><i class="bi bi-cpu"></i> Ensino Superior</small>
+                                </div>
+                                <h4 class="h5 text-white mb-1">Engenharia da Computação</h4>
+                                <p class="text-secondary small mb-2">Arquitetura de Computadores, Sistemas Embarcados, Automação, Redes e Engenharia de Software.</p>
+                                <span class="text-success small"><i class="bi bi-check-circle-fill me-1"></i>Perto de se formar</span>
+                            </div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="timeline-item">
+                            <span class="timeline-dot"></span>
+                            <div class="cyber-card p-4">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                    <span class="badge bg-purple text-white font-code" style="background-color: var(--neon-purple);">Em Conclusão</span>
+                                    <small class="text-info font-code"><i class="bi bi-hdd-network"></i> Ensino Superior</small>
+                                </div>
+                                <h4 class="h5 text-white mb-1">Bacharelado em Tecnologia da Informação (TI)</h4>
+                                <p class="text-secondary small mb-2">Gestão de Sistemas de Informação, Banco de Dados, Governança de TI e Desenvolvimento de Aplicações.</p>
+                                <span class="text-success small"><i class="bi bi-check-circle-fill me-1"></i>Perto de se formar</span>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="timeline-item mb-0">
+                            <span class="timeline-dot"></span>
+                            <div class="cyber-card p-4">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                    <span class="badge bg-success text-dark font-code">Cursando</span>
+                                    <small class="text-info font-code"><i class="bi bi-building"></i> Centro Paula Souza</small>
+                                </div>
+                                <h4 class="h5 text-white mb-1">Técnico em Desenvolvimento de Sistemas — ETEC de Dracena</h4>
+                                <p class="text-secondary small mb-0">Desenvolvimento Web (HTML5, CSS3, Bootstrap, JS), Lógica de Programação, Python e Modelagem de Sistemas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coluna Direita: Habilidades Técnicas & Barras Animadas -->
+                <div class="col-lg-6" data-aos="fade-left">
+                    <h3 class="h4 mb-4 text-success d-flex align-items-center gap-2">
+                        <i class="bi bi-lightning-charge-fill"></i> Stack Tecnológica & Competências
+                    </h3>
+
+                    <div class="cyber-card p-4 mb-4">
+                        <!-- Skill 1 -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-semibold"><i class="bi bi-filetype-py text-warning me-2"></i>Python & Automação de Sistemas</span>
+                                <span class="font-code text-info">92%</span>
+                            </div>
+                            <div class="progress progress-cyber">
+                                <div class="progress-bar progress-bar-cyber" role="progressbar" style="width: 92%" aria-valuenow="92" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <!-- Skill 2 -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-semibold"><i class="bi bi-bootstrap-fill text-purple me-2" style="color: #b829ea;"></i>HTML5, CSS3 & Bootstrap 5</span>
+                                <span class="font-code text-info">90%</span>
+                            </div>
+                            <div class="progress progress-cyber">
+                                <div class="progress-bar progress-bar-cyber" role="progressbar" style="width: 90%" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <!-- Skill 3 -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-semibold"><i class="bi bi-filetype-js text-warning me-2"></i>JavaScript & Interatividade Web</span>
+                                <span class="font-code text-info">85%</span>
+                            </div>
+                            <div class="progress progress-cyber">
+                                <div class="progress-bar progress-bar-cyber" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <!-- Skill 4 -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-semibold"><i class="bi bi-diagram-3-fill text-success me-2"></i>Lógica de Programação & Algoritmos</span>
+                                <span class="font-code text-info">95%</span>
+                            </div>
+                            <div class="progress progress-cyber">
+                                <div class="progress-bar progress-bar-cyber" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <!-- Skill 5 -->
+                        <div class="mb-0">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-semibold"><i class="bi bi-sliders text-info me-2"></i>Sistemas de Automação, Controle & Git</span>
+                                <span class="font-code text-info">88%</span>
+                            </div>
+                            <div class="progress progress-cyber">
+                                <div class="progress-bar progress-bar-cyber" role="progressbar" style="width: 88%" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Cards de Especialidades -->
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="cyber-card p-3 text-center h-100">
+                                <i class="bi bi-droplet-half fs-2 text-info mb-2 d-block"></i>
+                                <h5 class="h6 text-white mb-1">Telemetria & Controle</h5>
+                                <small class="text-secondary">Monitoramento de níveis e recursos hídricos</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="cyber-card p-3 text-center h-100">
+                                <i class="bi bi-lightning-fill fs-2 text-warning mb-2 d-block"></i>
+                                <h5 class="h6 text-white mb-1">Eficiência Energética</h5>
+                                <small class="text-secondary">Cálculo inteligente de consumo elétrico</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         4. SEÇÃO DE PROJETOS (CAROUSEL BOOTSTRAP 5 + FILTROS + SIMULADORES REAIS)
+         ========================================================================== -->
+    <section id="projetos" class="section-padding">
+        <div class="container">
+            <div class="text-center" data-aos="fade-up">
+                <span class="section-subtitle">&lt;repositorios_github /&gt;</span>
+                <h2 class="section-title gradient-text">Projetos & Sistemas Desenvolvidos</h2>
+                <p class="text-secondary mx-auto mb-3" style="max-width: 680px;">
+                    Explore os projetos reais publicados no meu GitHub (<a href="https://github.com/carlos17041976" target="_blank" class="text-info text-decoration-none">github.com/carlos17041976</a>). Clique em <strong>"Testar Simulador"</strong> para executar a lógica de cada sistema diretamente no navegador!
+                </p>
+                <div class="title-line"></div>
+            </div>
+
+            <!-- CAROUSEL BOOTSTRAP 5 COM EFEITOS VISUAIS NEON -->
+            <div id="projetosCarousel" class="carousel slide carousel-cyber mb-5" data-bs-ride="carousel" data-aos="zoom-in">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#projetosCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                    <button type="button" data-bs-target="#projetosCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#projetosCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                </div>
+
+                <div class="carousel-inner">
+                    <!-- Slide 1 -->
+                    <div class="carousel-item active">
+                        <div class="row align-items-center justify-content-center px-md-5">
+                            <div class="col-md-7 text-center text-md-start">
+                                <span class="badge bg-info text-dark font-code mb-2">DESTAQUE #01 • AUTOMAÇÃO PYTHON</span>
+                                <h3 class="h2 text-white fw-bold mb-3">Controle de Níveis de Água</h3>
+                                <p class="text-secondary mb-4">
+                                    Sistema inteligente em Python projetado para monitoramento operacional de reservatórios, classificando alertas críticos de nível (escala de 1 a 5) lançados pelo operador em tempo real.
+                                </p>
+                                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
+                                    <button class="btn btn-cyber-primary btn-sm" onclick="openSimulator('niveis')">
+                                        <i class="bi bi-play-fill me-1"></i>Testar Simulador (1 a 5)
+                                    </button>
+                                    <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-outline-light btn-sm rounded-3">
+                                        <i class="bi bi-github me-1"></i>Ver no GitHub
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mt-4 mt-md-0">
+                                <div class="p-4 rounded-4 border border-info border-opacity-50 bg-dark bg-opacity-75">
+                                    <i class="bi bi-water display-1 text-info"></i>
+                                    <div class="font-code text-success mt-2 small">STATUS: SENSOR_ATIVO [1..5]</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2 -->
+                    <div class="carousel-item">
+                        <div class="row align-items-center justify-content-center px-md-5">
+                            <div class="col-md-7 text-center text-md-start">
+                                <span class="badge bg-warning text-dark font-code mb-2">DESTAQUE #02 • EFICIÊNCIA ENERGÉTICA</span>
+                                <h3 class="h2 text-white fw-bold mb-3">Consumo de Energia Elétrica</h3>
+                                <p class="text-secondary mb-4">
+                                    Algoritmo em Python que calcula com precisão o gasto energético (kWh) de eletrodomésticos com base na potência (Watts) e tempo de uso diário, auxiliando na economia doméstica.
+                                </p>
+                                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
+                                    <button class="btn btn-cyber-primary btn-sm" onclick="openSimulator('energia')">
+                                        <i class="bi bi-lightning-charge-fill me-1"></i>Simular Consumo kWh
+                                    </button>
+                                    <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-outline-light btn-sm rounded-3">
+                                        <i class="bi bi-github me-1"></i>Ver no GitHub
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mt-4 mt-md-0">
+                                <div class="p-4 rounded-4 border border-warning border-opacity-50 bg-dark bg-opacity-75">
+                                    <i class="bi bi-lightning-charge display-1 text-warning"></i>
+                                    <div class="font-code text-warning mt-2 small">CALCULO: (W * H * DIAS) / 1000</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div class="carousel-item">
+                        <div class="row align-items-center justify-content-center px-md-5">
+                            <div class="col-md-7 text-center text-md-start">
+                                <span class="badge bg-success text-dark font-code mb-2">DESTAQUE #03 • GESTÃO COMERCIAL</span>
+                                <h3 class="h2 text-white fw-bold mb-3">Sistema de Desconto Progressivo</h3>
+                                <p class="text-secondary mb-4">
+                                    Solução comercial em Python que aplica faixas dinâmicas de desconto (5%, 10% e 15%) conforme o valor total da compra, automatizando regras de negócio no ponto de venda.
+                                </p>
+                                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
+                                    <button class="btn btn-cyber-primary btn-sm" onclick="openSimulator('desconto')">
+                                        <i class="bi bi-percent me-1"></i>Simular Descontos
+                                    </button>
+                                    <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-outline-light btn-sm rounded-3">
+                                        <i class="bi bi-github me-1"></i>Ver no GitHub
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mt-4 mt-md-0">
+                                <div class="p-4 rounded-4 border border-success border-opacity-50 bg-dark bg-opacity-75">
+                                    <i class="bi bi-cart-check display-1 text-success"></i>
+                                    <div class="font-code text-success mt-2 small">FAIXAS: 5% | 10% | 15% OFF</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#projetosCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#projetosCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próximo</span>
+                </button>
+            </div>
+
+            <!-- FILTROS DE PROJETOS -->
+            <div class="d-flex justify-content-center flex-wrap gap-2 mb-4" data-aos="fade-up">
+                <button class="btn btn-sm btn-info fw-bold rounded-pill px-3 filter-btn active" data-filter="all">Todos (6)</button>
+                <button class="btn btn-sm btn-outline-info rounded-pill px-3 filter-btn" data-filter="utilidades">Sustentabilidade & Recursos</button>
+                <button class="btn btn-sm btn-outline-info rounded-pill px-3 filter-btn" data-filter="negocios">Negócios & Dados</button>
+                <button class="btn btn-sm btn-outline-info rounded-pill px-3 filter-btn" data-filter="perfil">Perfil & Docs</button>
+            </div>
+
+            <!-- GRADE DE CARDS DOS 6 REPOSITÓRIOS DO GITHUB -->
+            <div class="row g-4" id="projectsGrid">
+                <!-- Projeto 1: Controle de níveis de água -->
+                <div class="col-md-6 col-lg-4 project-card-item" data-category="utilidades" data-aos="fade-up" data-aos-delay="50">
+                    <div class="cyber-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary bg-opacity-25 text-info border border-info border-opacity-50 font-code">
+                                    <i class="bi bi-circle-fill text-info me-1" style="font-size: 8px;"></i>Python
+                                </span>
+                                <span class="badge bg-secondary bg-opacity-25 text-light">Público</span>
+                            </div>
+                            <h4 class="h5 text-white mb-2">
+                                <i class="bi bi-sliders2-vertical text-info me-2"></i>Controle de níveis de água
+                            </h4>
+                            <p class="text-secondary small mb-4">
+                                Sistema em Python que indica o estado do nível de água a partir de dados lançados pelo operador (escala operacional de 1 a 5).
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2 pt-3 border-top border-secondary border-opacity-25">
+                            <button class="btn btn-sm btn-info fw-semibold flex-grow-1" onclick="openSimulator('niveis')">
+                                <i class="bi bi-cpu me-1"></i>Simular (1-5)
+                            </button>
+                            <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-sm btn-outline-light" title="Abrir no GitHub">
+                                <i class="bi bi-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projeto 2: Consumo de Energia -->
+                <div class="col-md-6 col-lg-4 project-card-item" data-category="utilidades" data-aos="fade-up" data-aos-delay="100">
+                    <div class="cyber-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary bg-opacity-25 text-info border border-info border-opacity-50 font-code">
+                                    <i class="bi bi-circle-fill text-warning me-1" style="font-size: 8px;"></i>Python
+                                </span>
+                                <span class="badge bg-secondary bg-opacity-25 text-light">Público</span>
+                            </div>
+                            <h4 class="h5 text-white mb-2">
+                                <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Consumo de Energia
+                            </h4>
+                            <p class="text-secondary small mb-4">
+                                Programa em Python que calcula o consumo de eletrodomésticos em kWh e projeta o impacto mensal na fatura de energia.
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2 pt-3 border-top border-secondary border-opacity-25">
+                            <button class="btn btn-sm btn-info fw-semibold flex-grow-1" onclick="openSimulator('energia')">
+                                <i class="bi bi-calculator me-1"></i>Simular kWh
+                            </button>
+                            <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-sm btn-outline-light" title="Abrir no GitHub">
+                                <i class="bi bi-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projeto 3: Consumo de água -->
+                <div class="col-md-6 col-lg-4 project-card-item" data-category="utilidades" data-aos="fade-up" data-aos-delay="150">
+                    <div class="cyber-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary bg-opacity-25 text-info border border-info border-opacity-50 font-code">
+                                    <i class="bi bi-circle-fill text-info me-1" style="font-size: 8px;"></i>Python
+                                </span>
+                                <span class="badge bg-secondary bg-opacity-25 text-light">Público</span>
+                            </div>
+                            <h4 class="h5 text-white mb-2">
+                                <i class="bi bi-droplet-fill text-primary me-2"></i>Consumo de água
+                            </h4>
+                            <p class="text-secondary small mb-4">
+                                Programa em Python que classifica o perfil de consumo hídrico da moradia conforme o volume mensal medido em m³.
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2 pt-3 border-top border-secondary border-opacity-25">
+                            <button class="btn btn-sm btn-info fw-semibold flex-grow-1" onclick="openSimulator('agua')">
+                                <i class="bi bi-speedometer2 me-1"></i>Simular m³
+                            </button>
+                            <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-sm btn-outline-light" title="Abrir no GitHub">
+                                <i class="bi bi-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projeto 4: Sistema de desconto progressivo -->
+                <div class="col-md-6 col-lg-4 project-card-item" data-category="negocios" data-aos="fade-up" data-aos-delay="200">
+                    <div class="cyber-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary bg-opacity-25 text-info border border-info border-opacity-50 font-code">
+                                    <i class="bi bi-circle-fill text-success me-1" style="font-size: 8px;"></i>Python
+                                </span>
+                                <span class="badge bg-secondary bg-opacity-25 text-light">Público</span>
+                            </div>
+                            <h4 class="h5 text-white mb-2">
+                                <i class="bi bi-tags-fill text-success me-2"></i>Sistema de desconto progressivo
+                            </h4>
+                            <p class="text-secondary small mb-4">
+                                Programa em Python que calcula automaticamente descontos escalonados de 5%, 10% e 15% de acordo com o valor da compra.
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2 pt-3 border-top border-secondary border-opacity-25">
+                            <button class="btn btn-sm btn-info fw-semibold flex-grow-1" onclick="openSimulator('desconto')">
+                                <i class="bi bi-percent me-1"></i>Simular Venda
+                            </button>
+                            <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-sm btn-outline-light" title="Abrir no GitHub">
+                                <i class="bi bi-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projeto 5: Contador_de_respostas -->
+                <div class="col-md-6 col-lg-4 project-card-item" data-category="negocios" data-aos="fade-up" data-aos-delay="250">
+                    <div class="cyber-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary bg-opacity-25 text-info border border-info border-opacity-50 font-code">
+                                    <i class="bi bi-circle-fill text-info me-1" style="font-size: 8px;"></i>Python
+                                </span>
+                                <span class="badge bg-secondary bg-opacity-25 text-light">Público</span>
+                            </div>
+                            <h4 class="h5 text-white mb-2">
+                                <i class="bi bi-bar-chart-line-fill text-purple me-2" style="color: #b829ea;"></i>Contador_de_respostas
+                            </h4>
+                            <p class="text-secondary small mb-4">
+                                Programa em Python desenvolvido para coleta, contabilização e estatística de pesquisa de satisfação de clientes.
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2 pt-3 border-top border-secondary border-opacity-25">
+                            <button class="btn btn-sm btn-info fw-semibold flex-grow-1" onclick="openSimulator('pesquisa')">
+                                <i class="bi bi-ui-checks me-1"></i>Testar Pesquisa
+                            </button>
+                            <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-sm btn-outline-light" title="Abrir no GitHub">
+                                <i class="bi bi-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projeto 6: carlos17041976 README -->
+                <div class="col-md-6 col-lg-4 project-card-item" data-category="perfil" data-aos="fade-up" data-aos-delay="300">
+                    <div class="cyber-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 font-code">
+                                    <i class="bi bi-markdown-fill me-1"></i>GitHub Profile
+                                </span>
+                                <span class="badge bg-secondary bg-opacity-25 text-light">Público</span>
+                            </div>
+                            <h4 class="h5 text-white mb-2">
+                                <i class="bi bi-person-badge-fill text-info me-2"></i>carlos17041976
+                            </h4>
+                            <p class="text-secondary small mb-4">
+                                "Um pouquinho sobre mim..." — Repositório especial de apresentação profissional, trajetória na ETEC de Dracena e Engenharia da Computação.
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2 pt-3 border-top border-secondary border-opacity-25">
+                            <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-sm btn-outline-info fw-semibold flex-grow-1">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>Acessar Perfil GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         5. RECURSO NOVO: LABORATÓRIO INTERATIVO (TERMINAL PYTHON + VÍDEO / IFRAME)
+         ========================================================================== -->
+    <section id="laboratorio" class="section-padding">
+        <div class="container">
+            <div class="text-center" data-aos="fade-up">
+                <span class="section-subtitle">&lt;recurso_interativo /&gt;</span>
+                <h2 class="section-title gradient-text">Laboratório Tech & Demonstração</h2>
+                <div class="title-line"></div>
+            </div>
+
+            <div class="row g-4 align-items-stretch">
+                <!-- Terminal Interativo Simulando Scripts Python -->
+                <div class="col-lg-6" data-aos="fade-right">
+                    <div class="terminal-window h-100 d-flex flex-column">
+                        <div class="terminal-header">
+                            <div class="terminal-dots">
+                                <span style="background: #ff5f56;"></span>
+                                <span style="background: #ffbd2e;"></span>
+                                <span style="background: #27c93f;"></span>
+                            </div>
+                            <span class="font-code small text-secondary">carlos@etec-dracena:~/projetos-python$</span>
+                            <button class="btn btn-sm btn-outline-success py-0 px-2 font-code" onclick="clearTerminal()">Limpar</button>
+                        </div>
+                        <div class="terminal-body flex-grow-1" id="pythonTerminalOutput">
+                            <div class="text-info mb-2">>>> Inicializando ambiente Python 3.12 (Carlos Fernandes Fidalgo)...</div>
+                            <div class="text-secondary mb-3">Selecione um script abaixo para executar a demonstração em tempo real:</div>
+                        </div>
+                        <div class="p-3 bg-dark border-top border-secondary border-opacity-25 d-flex flex-wrap gap-2">
+                            <button class="btn btn-sm btn-outline-info font-code" onclick="runTerminalDemo('niveis')">▶ nivel_agua.py</button>
+                            <button class="btn btn-sm btn-outline-warning font-code" onclick="runTerminalDemo('energia')">▶ consumo_energia.py</button>
+                            <button class="btn btn-sm btn-outline-success font-code" onclick="runTerminalDemo('desconto')">▶ desconto.py</button>
+                            <button class="btn btn-sm btn-outline-light font-code" onclick="runTerminalDemo('sobre')">▶ sobre_carlos.py</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vídeo / Iframe Tecnológico Responsivo -->
+                <div class="col-lg-6" data-aos="fade-left">
+                    <div class="cyber-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50 font-code">
+                                    <i class="bi bi-broadcast me-1"></i>MÍDIA & INSPIRAÇÃO TECH
+                                </span>
+                                <span class="font-code small text-info">4K • TECH SHOWCASE</span>
+                            </div>
+                            <h3 class="h5 text-white mb-2">Engenharia da Computação, Python & Futuro</h3>
+                            <p class="text-secondary small mb-3">
+                                Conteúdo multimídia integrado demonstrando o universo da programação em Python, automação e sistemas modernos estudados na ETEC de Dracena e na graduação.
+                            </p>
+                        </div>
+
+                        <div class="ratio ratio-16x9 rounded-4 overflow-hidden border border-info border-opacity-50 shadow">
+                            <iframe 
+                                src="https://www.youtube-nocookie.com/embed/rfscVS0vtbw?rel=0" 
+                                title="Curso e Fundamentos de Programação Python" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen
+                                loading="lazy"
+                                referrerpolicy="strict-origin-when-cross-origin">
+                            </iframe>
+                        </div>
+
+                        <div class="mt-3 d-flex justify-content-between align-items-center small text-secondary">
+                            <span><i class="bi bi-soundwave text-info me-1"></i>Dica: Ative o <strong>Som Tecno</strong> no topo!</span>
+                            <button class="btn btn-sm btn-link text-info text-decoration-none p-0" data-bs-toggle="modal" data-bs-target="#githubPagesModal">
+                                <i class="bi bi-cloud-upload me-1"></i>Guia GitHub Pages
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         6. SEÇÃO DE CONTATO (VALIDAÇÃO EM TEMPO REAL + LINKS PROFISSIONAIS)
+         ========================================================================== -->
+    <section id="contato" class="section-padding">
+        <div class="container">
+            <div class="text-center" data-aos="fade-up">
+                <span class="section-subtitle">&lt;conectar_rede /&gt;</span>
+                <h2 class="section-title gradient-text">Entre em Contato</h2>
+                <div class="title-line"></div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Informações Diretas -->
+                <div class="col-lg-5" data-aos="fade-right">
+                    <div class="cyber-card p-4 h-100">
+                        <h3 class="h4 text-white mb-3">Vamos conversar sobre Tecnologia?</h3>
+                        <p class="text-secondary mb-4">
+                            Estou aberto a oportunidades de estágio, projetos de desenvolvimento de sistemas, automação em Python e networking na área de TI e Engenharia da Computação.
+                        </p>
+
+                        <div class="d-flex flex-column gap-3">
+                            <a href="https://github.com/carlos17041976" target="_blank" class="text-decoration-none p-3 rounded-3 border border-secondary border-opacity-25 bg-dark bg-opacity-50 d-flex align-items-center gap-3 text-white">
+                                <i class="bi bi-github fs-3 text-info"></i>
+                                <div>
+                                    <div class="fw-semibold">GitHub Oficial</div>
+                                    <small class="text-info">github.com/carlos17041976</small>
+                                </div>
+                            </a>
+
+                            <div class="p-3 rounded-3 border border-secondary border-opacity-25 bg-dark bg-opacity-50 d-flex align-items-center gap-3">
+                                <i class="bi bi-geo-alt-fill fs-3 text-success"></i>
+                                <div>
+                                    <div class="fw-semibold text-white">Localização & Instituição</div>
+                                    <small class="text-secondary">Dracena — SP • ETEC de Dracena</small>
+                                </div>
+                            </div>
+
+                            <div class="p-3 rounded-3 border border-secondary border-opacity-25 bg-dark bg-opacity-50 d-flex align-items-center gap-3">
+                                <i class="bi bi-envelope-at-fill fs-3 text-warning"></i>
+                                <div>
+                                    <div class="fw-semibold text-white">E-mail Profissional</div>
+                                    <small class="text-secondary">carlosfidalgo.pc@gmail.com</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulário com Validação em Tempo Real -->
+                <div class="col-lg-7" data-aos="fade-left">
+                    <div class="cyber-card p-4 h-100">
+                        <form id="contactForm" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="contactName" class="form-label small text-info font-code">Seu Nome *</label>
+                                    <input type="text" class="form-control form-control-cyber" id="contactName" placeholder="Ex: Prof. Avaliador / Recrutador" required minlength="3">
+                                    <div class="invalid-feedback">Por favor, informe seu nome (mínimo 3 caracteres).</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="contactEmail" class="form-label small text-info font-code">Seu E-mail *</label>
+                                    <input type="email" class="form-control form-control-cyber" id="contactEmail" placeholder="seuemail@exemplo.com" required>
+                                    <div class="invalid-feedback">Insira um endereço de e-mail válido.</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="contactSubject" class="form-label small text-info font-code">Assunto *</label>
+                                    <select class="form-select form-control-cyber" id="contactSubject" required>
+                                        <option value="" selected disabled>Selecione o motivo do contato...</option>
+                                        <option value="Projeto / Freelance">Proposta de Projeto / Desenvolvimento</option>
+                                        <option value="Oportunidade TI / Engenharia">Oportunidade de Estágio / Vaga em TI</option>
+                                        <option value="Avaliação Acadêmica ETEC">Avaliação Acadêmica — ETEC de Dracena</option>
+                                        <option value="Networking">Networking & Parcerias</option>
+                                    </select>
+                                    <div class="invalid-feedback">Selecione um assunto.</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="contactMessage" class="form-label small text-info font-code">Mensagem *</label>
+                                    <textarea class="form-control form-control-cyber" id="contactMessage" rows="4" placeholder="Escreva sua mensagem para o Carlos..." required minlength="10"></textarea>
+                                    <div class="invalid-feedback">A mensagem deve ter pelo menos 10 caracteres.</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-cyber-primary w-100">
+                                        <i class="bi bi-send-fill me-2"></i>Transmitir Mensagem
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Feedback Visual Animado (Substitui alert()) -->
+                        <div id="contactFeedback" class="alert alert-success mt-3 d-none border-success bg-success bg-opacity-10 text-light" role="alert">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                                <div>
+                                    <strong>Mensagem enviada com sucesso!</strong>
+                                    <div class="small">Obrigado pelo contato. Carlos Fernandes Fidalgo responderá em breve.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         7. RODAPÉ COMPLETO + BOTÃO GUIA GITHUB PAGES
+         ========================================================================== -->
+    <footer class="py-5 border-top border-info border-opacity-25" style="background: rgba(5, 7, 15, 0.92);">
+        <div class="container">
+            <div class="row gy-4 align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <div class="font-cyber fw-bold fs-5 text-white mb-1">CARLOS FERNANDES FIDALGO</div>
+                    <p class="text-secondary small mb-0">
+                        Desenvolvimento de Sistemas (ETEC de Dracena) • Engenharia da Computação • Bacharelado em TI
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <button class="btn btn-sm btn-outline-info rounded-pill me-2 mb-2 mb-sm-0" data-bs-toggle="modal" data-bs-target="#githubPagesModal">
+                        <i class="bi bi-rocket-fill me-1"></i>Como publicar no GitHub Pages
+                    </button>
+                    <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-sm btn-outline-light rounded-pill">
+                        <i class="bi bi-github me-1"></i>@carlos17041976
+                    </a>
+                </div>
+            </div>
+            <hr class="border-secondary border-opacity-25 my-4">
+            <div class="text-center small text-secondary">
+                &copy; 2026 Carlos Fernandes Fidalgo. Desenvolvido com Bootstrap 5, JavaScript & Web Audio API.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão Flutuante de Áudio Tecno -->
+    <div class="floating-audio-btn d-md-none">
+        <button type="button" class="btn-techno techno-toggle-btn shadow-lg" aria-label="Alternar Música Tecno">
+            <i class="bi bi-volume-up-fill"></i>
+            <span class="techno-label">Tecno</span>
+            <span class="eq-bars" aria-hidden="true">
+                <span class="eq-bar"></span>
+                <span class="eq-bar"></span>
+                <span class="eq-bar"></span>
+            </span>
+        </button>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 1: SIMULADOR INTERATIVO DOS PROJETOS PYTHON DO CARLOS
+         ========================================================================== -->
+    <div class="modal fade" id="simulatorModal" tabindex="-1" aria-labelledby="simulatorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark border border-info shadow-lg">
+                <div class="modal-header border-bottom border-secondary border-opacity-25">
+                    <h5 class="modal-title font-cyber text-info" id="simulatorModalLabel">
+                        <i class="bi bi-cpu-fill me-2"></i>Simulador Python Interativo
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body p-4" id="simulatorModalBody">
+                    <!-- Conteúdo injetado dinamicamente via JavaScript -->
+                </div>
+                <div class="modal-footer border-top border-secondary border-opacity-25">
+                    <a href="https://github.com/carlos17041976" target="_blank" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-github me-1"></i>Repositório no GitHub
+                    </a>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 2: GUIA PASSO A PASSO DE PUBLICAÇÃO NO GITHUB PAGES
+         ========================================================================== -->
+    <div class="modal fade" id="githubPagesModal" tabindex="-1" aria-labelledby="githubPagesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-dark border border-success shadow-lg">
+                <div class="modal-header border-bottom border-secondary border-opacity-25">
+                    <h5 class="modal-title font-cyber text-success" id="githubPagesModalLabel">
+                        <i class="bi bi-github me-2"></i>Publicação no GitHub Pages (carlos17041976)
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-secondary">
+                        Siga estes passos simples para colocar este portfólio no ar gratuitamente usando sua conta <strong>github.com/carlos17041976</strong>:
+                    </p>
+                    <ol class="list-group list-group-numbered list-group-flush mb-3">
+                        <li class="list-group-item bg-transparent text-light border-secondary border-opacity-25">
+                            Acesse <a href="https://github.com/carlos17041976" target="_blank" class="text-info">github.com/carlos17041976</a> e clique em <strong>New repository</strong>.
+                        </li>
+                        <li class="list-group-item bg-transparent text-light border-secondary border-opacity-25">
+                            Nomeie o repositório como <code class="text-warning">carlos17041976.github.io</code> (ou <code class="text-warning">portfolio-carlos</code>) e marque como <strong>Public</strong>.
+                        </li>
+                        <li class="list-group-item bg-transparent text-light border-secondary border-opacity-25">
+                            Faça upload deste arquivo salvo exatamente com o nome <code class="text-success">index.html</code>.
+                        </li>
+                        <li class="list-group-item bg-transparent text-light border-secondary border-opacity-25">
+                            Vá em <strong>Settings (Configurações) &gt; Pages</strong>, em <em>Branch</em> selecione <strong>main</strong> e clique em <strong>Save</strong>.
+                        </li>
+                        <li class="list-group-item bg-transparent text-light border-0">
+                            Aguarde cerca de 1 minuto e seu site estará online em: <br>
+                            <code class="text-info">https://carlos17041976.github.io/</code>
+                        </li>
+                    </ol>
+                </div>
+                <div class="modal-footer border-top border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-success btn-sm fw-bold" data-bs-dismiss="modal">Entendido!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        /* ==========================================================================
+           1. INICIALIZAÇÃO AOS & EFEITO DE DIGITAÇÃO (TYPEWRITER)
+           ========================================================================== */
+        AOS.init({
+            once: true,
+            offset: 60
+        });
+
+        const roles = [
+            "Estudante de Desenvolvimento de Sistemas — ETEC Dracena",
+            "Futuro Engenheiro da Computação",
+            "Bacharelando em Tecnologia da Informação (TI)",
+            "Desenvolvedor Python, Web & Automação"
+        ];
+        let roleIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typewriterEl = document.getElementById("typewriter-text");
+
+        function typeEffect() {
+            const currentRole = roles[roleIndex];
+            if (isDeleting) {
+                typewriterEl.textContent = currentRole.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typewriterEl.textContent = currentRole.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let speed = isDeleting ? 35 : 65;
+
+            if (!isDeleting && charIndex === currentRole.length) {
+                speed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                roleIndex = (roleIndex + 1) % roles.length;
+                speed = 400;
+            }
+
+            setTimeout(typeEffect, speed);
+        }
+        typeEffect();
+
+        /* ==========================================================================
+           2. SINTETIZADOR TECNO / SYNTHWAVE PROCEDURAL (WEB AUDIO API)
+              - Kick 4/4 profundo, Hi-Hats metálicos, Bassline Arpejada e Pad Neon
+           ========================================================================== */
+        class TechnoSynthEngine {
+            constructor() {
+                this.ctx = null;
+                this.isPlaying = false;
+                this.timerID = null;
+                this.step = 0;
+                this.bpm = 128;
+                // Escala Menor Cyberpunk (Lá menor / Fá / Dó / Sol)
+                this.bassNotes = [
+                    55.00, 55.00, 110.00, 55.00,
+                    65.41, 65.41, 130.81, 65.41,
+                    43.65, 43.65, 87.31,  43.65,
+                    49.00, 49.00, 98.00,  73.42
+                ];
+                this.arpNotes = [
+                    440.00, 523.25, 659.25, 880.00,
+                    523.25, 659.25, 783.99, 1046.50,
+                    349.23, 440.00, 523.25, 698.46,
+                    392.00, 493.88, 587.33, 783.99
+                ];
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playKick(time) {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(145, time);
+                osc.frequency.exponentialRampToValueAtTime(38, time + 0.14);
+
+                gain.gain.setValueAtTime(0.65, time);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(time);
+                osc.stop(time + 0.29);
+            }
+
+            playHiHat(time, open = false) {
+                const bufferSize = this.ctx.sampleRate * (open ? 0.14 : 0.045);
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.setValueAtTime(7500, time);
+
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(open ? 0.16 : 0.09, time);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + (open ? 0.13 : 0.04));
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                noise.start(time);
+            }
+
+            playBass(time, freq) {
+                const osc = this.ctx.createOscillator();
+                const filter = this.ctx.createBiquadFilter();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freq, time);
+
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(180, time);
+                filter.frequency.exponentialRampToValueAtTime(850, time + 0.06);
+                filter.frequency.exponentialRampToValueAtTime(200, time + 0.18);
+
+                gain.gain.setValueAtTime(0.24, time);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + 0.19);
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(time);
+                osc.stop(time + 0.2);
+            }
+
+            playArp(time, freq) {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, time);
+
+                gain.gain.setValueAtTime(0.08, time);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(time);
+                osc.stop(time + 0.17);
+            }
+
+            scheduleStep() {
+                const now = this.ctx.currentTime;
+                const s = this.step % 16;
+
+                // Kick 4/4 nos tempos 0, 4, 8, 12
+                if (s % 4 === 0) {
+                    this.playKick(now);
+                }
+                // Hi-Hat contratempo
+                if (s % 4 === 2) {
+                    this.playHiHat(now, true);
+                } else if (s % 2 === 1) {
+                    this.playHiHat(now, false);
+                }
+
+                // Linha de baixo pulsante
+                this.playBass(now, this.bassNotes[s]);
+
+                // Arpejo futurista a cada 2 passos
+                if (s % 2 === 0) {
+                    this.playArp(now, this.arpNotes[s]);
+                }
+
+                this.step++;
+            }
+
+            toggle() {
+                if (this.isPlaying) {
+                    this.stop();
+                } else {
+                    this.start();
+                }
+                return this.isPlaying;
+            }
+
+            start() {
+                this.init();
+                if (this.isPlaying) return;
+                this.isPlaying = true;
+                const sixteenthMs = (60 / this.bpm / 4) * 1000;
+                this.scheduleStep();
+                this.timerID = setInterval(() => this.scheduleStep(), sixteenthMs);
+            }
+
+            stop() {
+                this.isPlaying = false;
+                if (this.timerID) {
+                    clearInterval(this.timerID);
+                    this.timerID = null;
+                }
+            }
+        }
+
+        const technoEngine = new TechnoSynthEngine();
+        const technoButtons = document.querySelectorAll('.techno-toggle-btn');
+
+        technoButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const active = technoEngine.toggle();
+                technoButtons.forEach(b => {
+                    const label = b.querySelector('.techno-label');
+                    if (active) {
+                        b.classList.add('playing');
+                        if (label) label.textContent = label.textContent.includes('Som') ? 'Som Tecno: ON' : 'Tecno ON';
+                    } else {
+                        b.classList.remove('playing');
+                        if (label) label.textContent = label.textContent.includes('Som') ? 'Som Tecno: OFF' : 'Tecno OFF';
+                    }
+                });
+            });
+        });
+
+        /* ==========================================================================
+           3. CANVAS DE PARTÍCULAS INTERATIVAS NO FUNDO (CYBER NETWORK)
+           ========================================================================== */
+        const canvas = document.getElementById('cyber-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        function initParticles() {
+            particles = [];
+            const count = Math.min(Math.floor((canvas.width * canvas.height) / 16000), 85);
+            const colors = ['#00f3ff', '#b829ea', '#00ff88'];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.7,
+                    vy: (Math.random() - 0.5) * 0.7,
+                    radius: Math.random() * 2 + 1,
+                    color: colors[i % colors.length]
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 130) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${0.14 * (1 - dist / 130)})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.onload = function() {
+            resizeCanvas();
+            animateParticles();
+        };
+
+        /* ==========================================================================
+           4. FILTROS DA GRADE DE PROJETOS
+           ========================================================================== */
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const projectItems = document.querySelectorAll('.project-card-item');
+
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => {
+                    b.classList.remove('btn-info', 'fw-bold', 'active');
+                    b.classList.add('btn-outline-info');
+                });
+                btn.classList.remove('btn-outline-info');
+                btn.classList.add('btn-info', 'fw-bold', 'active');
+
+                const filter = btn.getAttribute('data-filter');
+                projectItems.forEach(item => {
+                    if (filter === 'all' || item.getAttribute('data-category') === filter) {
+                        item.classList.remove('d-none');
+                    } else {
+                        item.classList.add('d-none');
+                    }
+                });
+            });
+        });
+
+        /* ==========================================================================
+           5. SIMULADORES INTERATIVOS DOS REPOSITÓRIOS PYTHON (MODAL)
+           ========================================================================== */
+        const simulatorModal = new bootstrap.Modal(document.getElementById('simulatorModal'));
+        const modalTitle = document.getElementById('simulatorModalLabel');
+        const modalBody = document.getElementById('simulatorModalBody');
+
+        function openSimulator(type) {
+            if (type === 'niveis') {
+                modalTitle.innerHTML = '<i class="bi bi-sliders2-vertical me-2"></i>Controle de Níveis de Água (Python)';
+                modalBody.innerHTML = `
+                    <p class="text-secondary small">Selecione o nível lido pelo operador (1 a 5) para visualizar o diagnóstico do sistema:</p>
+                    <div class="mb-3">
+                        <label class="form-label text-info font-code">Entrada do Operador (1 a 5):</label>
+                        <input type="range" class="form-range" min="1" max="5" value="3" id="waterLevelRange" oninput="updateWaterSim(this.value)">
+                        <div class="d-flex justify-content-between font-code small text-secondary">
+                            <span>1 (Crítico Baixo)</span><span>2 (Baixo)</span><span>3 (Normal)</span><span>4 (Alto)</span><span>5 (Transbordamento)</span>
+                        </div>
+                    </div>
+                    <div id="waterSimResult" class="p-3 rounded-3 border border-success bg-success bg-opacity-10 text-light font-code">
+                        <strong>Nível 3:</strong> OPERAÇÃO NORMAL — Reservatório em equilíbrio estável.
+                    </div>
+                `;
+            } else if (type === 'energia') {
+                modalTitle.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>Consumo de Energia (Python)';
+                modalBody.innerHTML = `
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small text-info">Potência (Watts)</label>
+                            <input type="number" id="wattsInput" class="form-control form-control-cyber" value="1500">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-info">Horas/Dia</label>
+                            <input type="number" id="hoursInput" class="form-control form-control-cyber" value="2">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-info">Dias no Mês</label>
+                            <input type="number" id="daysInput" class="form-control form-control-cyber" value="30">
+                        </div>
+                    </div>
+                    <button class="btn btn-cyber-primary btn-sm mb-3" onclick="calcEnergySim()">Calcular Consumo</button>
+                    <div id="energySimResult" class="p-3 rounded-3 border border-warning bg-warning bg-opacity-10 font-code text-light">
+                        Consumo estimado: <strong>90.00 kWh/mês</strong> (Custo aprox. R$ 72,00 considerando R$ 0,80/kWh).
+                    </div>
+                `;
+            } else if (type === 'agua') {
+                modalTitle.innerHTML = '<i class="bi bi-droplet-fill me-2"></i>Consumo de Água Residencial (m³)';
+                modalBody.innerHTML = `
+                    <label class="form-label small text-info">Volume mensal consumido (m³):</label>
+                    <div class="input-group mb-3">
+                        <input type="number" id="waterM3Input" class="form-control form-control-cyber" value="14">
+                        <button class="btn btn-info fw-bold" onclick="calcWaterM3Sim()">Classificar</button>
+                    </div>
+                    <div id="waterM3Result" class="p-3 rounded-3 border border-info bg-info bg-opacity-10 font-code text-light">
+                        Volume <strong>14 m³</strong>: Classificação <strong>CONSUMO MODERADO / CONSCIENTE</strong>.
+                    </div>
+                `;
+            } else if (type === 'desconto') {
+                modalTitle.innerHTML = '<i class="bi bi-tags-fill me-2"></i>Sistema de Desconto Progressivo (5%, 10%, 15%)';
+                modalBody.innerHTML = `
+                    <label class="form-label small text-info">Valor Total da Compra (R$):</label>
+                    <div class="input-group mb-3">
+                        <input type="number" id="purchaseInput" class="form-control form-control-cyber" value="350">
+                        <button class="btn btn-success fw-bold" onclick="calcDiscountSim()">Aplicar Desconto</button>
+                    </div>
+                    <div id="discountSimResult" class="p-3 rounded-3 border border-success bg-success bg-opacity-10 font-code text-light">
+                        Compra de R$ 350,00 → Desconto de <strong>10% (R$ 35,00)</strong> → Valor Final: <strong>R$ 315,00</strong>.
+                    </div>
+                `;
+            } else if (type === 'pesquisa') {
+                modalTitle.innerHTML = '<i class="bi bi-bar-chart-line-fill me-2"></i>Contador de Respostas (Satisfação)';
+                modalBody.innerHTML = `
+                    <p class="small text-secondary">Clique para registrar votos na pesquisa de satisfação:</p>
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-success btn-sm" onclick="voteSurvey('otimo')">😍 Ótimo</button>
+                        <button class="btn btn-warning btn-sm" onclick="voteSurvey('regular')">😐 Regular</button>
+                        <button class="btn btn-danger btn-sm" onclick="voteSurvey('ruim')">😞 Ruim</button>
+                    </div>
+                    <div id="surveySimResult" class="p-3 rounded-3 border border-info bg-dark font-code text-light">
+                        Total: 10 respostas | Ótimo: 7 (70%) | Regular: 2 (20%) | Ruim: 1 (10%)
+                    </div>
+                `;
+            }
+            simulatorModal.show();
+        }
+
+        function updateWaterSim(val) {
+            const box = document.getElementById('waterSimResult');
+            const states = {
+                1: { cls: 'border-danger bg-danger', txt: 'Nível 1: ALERTA CRÍTICO — Nível muito baixo! Acionar bomba de recalque.' },
+                2: { cls: 'border-warning bg-warning', txt: 'Nível 2: ATENÇÃO — Nível abaixo do ideal. Monitorar reposição.' },
+                3: { cls: 'border-success bg-success', txt: 'Nível 3: OPERAÇÃO NORMAL — Reservatório em equilíbrio estável.' },
+                4: { cls: 'border-info bg-info', txt: 'Nível 4: NÍVEL ELEVADO — Próximo da capacidade máxima.' },
+                5: { cls: 'border-danger bg-danger', txt: 'Nível 5: PERIGO DE TRANSBORDAMENTO — Fechar válvula de entrada!' }
+            };
+            box.className = `p-3 rounded-3 border ${states[val].cls} bg-opacity-10 text-light font-code`;
+            box.innerHTML = `<strong>${states[val].txt}</strong>`;
+        }
+
+        function calcEnergySim() {
+            const w = parseFloat(document.getElementById('wattsInput').value) || 0;
+            const h = parseFloat(document.getElementById('hoursInput').value) || 0;
+            const d = parseFloat(document.getElementById('daysInput').value) || 0;
+            const kwh = (w * h * d) / 1000;
+            const cost = kwh * 0.80;
+            document.getElementById('energySimResult').innerHTML = `Consumo estimado: <strong>${kwh.toFixed(2)} kWh/mês</strong> (Custo aprox. <strong>R$ ${cost.toFixed(2)}</strong>).`;
+        }
+
+        function calcWaterM3Sim() {
+            const m3 = parseFloat(document.getElementById('waterM3Input').value) || 0;
+            let status = 'CONSUMO ECONÔMICO (Excelente)';
+            if (m3 > 10 && m3 <= 20) status = 'CONSUMO MODERADO / CONSCIENTE';
+            else if (m3 > 20) status = 'ALTO CONSUMO — Atenção ao desperdício!';
+            document.getElementById('waterM3Result').innerHTML = `Volume <strong>${m3} m³</strong>: Classificação <strong>${status}</strong>.`;
+        }
+
+        function calcDiscountSim() {
+            const val = parseFloat(document.getElementById('purchaseInput').value) || 0;
+            let rate = 5;
+            if (val >= 500) rate = 15;
+            else if (val >= 200) rate = 10;
+            const disc = val * (rate / 100);
+            const finalVal = val - disc;
+            document.getElementById('discountSimResult').innerHTML = `Compra de R$ ${val.toFixed(2)} → Desconto de <strong>${rate}% (R$ ${disc.toFixed(2)})</strong> → Valor Final: <strong>R$ ${finalVal.toFixed(2)}</strong>.`;
+        }
+
+        let surveyCounts = { otimo: 7, regular: 2, ruim: 1 };
+        function voteSurvey(type) {
+            surveyCounts[type]++;
+            const total = surveyCounts.otimo + surveyCounts.regular + surveyCounts.ruim;
+            const pO = ((surveyCounts.otimo / total) * 100).toFixed(0);
+            const pR = ((surveyCounts.regular / total) * 100).toFixed(0);
+            const pU = ((surveyCounts.ruim / total) * 100).toFixed(0);
+            document.getElementById('surveySimResult').innerHTML = `Total: ${total} respostas | Ótimo: ${surveyCounts.otimo} (${pO}%) | Regular: ${surveyCounts.regular} (${pR}%) | Ruim: ${surveyCounts.ruim} (${pU}%)`;
+        }
+
+        /* ==========================================================================
+           6. TERMINAL INTERATIVO DO LABORATÓRIO
+           ========================================================================== */
+        const terminalOutput = document.getElementById('pythonTerminalOutput');
+
+        function clearTerminal() {
+            terminalOutput.innerHTML = '<div class="text-secondary">Terminal limpo. Pronto para executar novos comandos...</div>';
+        }
+
+        function runTerminalDemo(script) {
+            const outputs = {
+                niveis: [
+                    '<span class="text-info">$ python3 nivel_agua.py</span>',
+                    'Informe o nível atual do reservatório (1 a 5): <span class="text-warning">4</span>',
+                    '[SISTEMA] Leitura registrada: Nível 4/5 (80% da capacidade).',
+                    '<span class="text-success">Status: Operação segura com reserva alta.</span>'
+                ],
+                energia: [
+                    '<span class="text-info">$ python3 consumo_energia.py</span>',
+                    'Aparelho: Ar-Condicionado | Potência: 1200W | Uso: 4h/dia (30 dias)',
+                    '[CÁLCULO] (1200 * 4 * 30) / 1000 = <span class="text-warning">144.0 kWh</span>',
+                    '<span class="text-success">Relatório gerado com sucesso!</span>'
+                ],
+                desconto: [
+                    '<span class="text-info">$ python3 desconto.py</span>',
+                    'Valor bruto do carrinho: <span class="text-warning">R$ 620.00</span>',
+                    '[REGRA] Compra acima de R$ 500 -> Faixa de 15% ativada!',
+                    '<span class="text-success">Total líquido com desconto: R$ 527.00</span>'
+                ],
+                sobre: [
+                    '<span class="text-info">$ python3 sobre_carlos.py</span>',
+                    'Nome: Carlos Fernandes Fidalgo (@carlos17041976)',
+                    'Formação: Eng. da Computação, Bacharelado em TI & Dev. Sistemas (ETEC Dracena)',
+                    '<span class="text-success">"Descobrindo o Universo da Tecnologia!"</span>'
+                ]
+            };
+
+            const lines = outputs[script] || [];
+            lines.forEach((line, idx) => {
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.className = 'mb-1';
+                    div.innerHTML = line;
+                    terminalOutput.appendChild(div);
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                }, idx * 240);
+            });
+        }
+
+        /* ==========================================================================
+           7. VALIDAÇÃO EM TEMPO REAL DO FORMULÁRIO DE CONTATO
+           ========================================================================== */
+        const contactForm = document.getElementById('contactForm');
+        const contactFeedback = document.getElementById('contactFeedback');
+
+        contactForm.querySelectorAll('input, select, textarea').forEach(field => {
+            field.addEventListener('input', () => {
+                if (field.checkValidity()) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                }
+            });
+        });
+
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!contactForm.checkValidity()) {
+                e.stopPropagation();
+                contactForm.classList.add('was-validated');
+                return;
+            }
+
+            contactFeedback.classList.remove('d-none');
+            contactForm.reset();
+            contactForm.classList.remove('was-validated');
+            contactForm.querySelectorAll('.is-valid').forEach(el => el.classList.remove('is-valid'));
+
+            setTimeout(() => {
+                contactFeedback.classList.add('d-none');
+            }, 6000);
+        });
+    </script>
+</body>
+</html>
